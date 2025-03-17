@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f5f5f5;    
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Top Navigation Bar */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .top-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav-icon {
+            position: relative;
+            font-size: 1.2rem;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 15px;
+            height: 15px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Right Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            right: 0;
+            width: 250px;
+            height: calc(100vh - 60px);
+            background: white;
+            padding: 2rem 1rem;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-item {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .sidebar-item:hover {
+            background: #f0f0f0;
+        }
+
+        .sidebar-item.active {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 60px;
+            margin-right: 250px;
+            padding: 2rem;
+            flex: 1;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Generation Categories Styles */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .category-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #1976d2;
+        }
+
+        .category-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .category-description {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .page-title i {
+            font-size: 2rem;
+            color: #1976d2;
+        }
+
+        .page-title h1 {
+            font-size: 2rem;
+            color: #333;
+        }
+
+        /* Brand Setup Styles */
+        .brands-container {
+            display: none;
+        }
+
+        .brands-container.active {
+            display: block;
+        }
+
+        .create-brand-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .create-brand-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .create-brand-icon {
+            font-size: 3rem;
+            color: #1976d2;
+            margin-bottom: 1rem;
+        }
+
+        .create-brand-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .create-brand-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Brand Setup Form */
+        .brand-setup {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .brand-setup.active {
+            display: block;
+        }
+
+        .setup-step {
+            margin-bottom: 2rem;
+        }
+
+        .setup-step h3 {
+            margin-bottom: 1rem;
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .input-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .color-picker-container {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .color-option.selected {
+            border-color: #1976d2;
+        }
+
+        .logo-upload {
+            border: 2px dashed #ddd;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .logo-upload:hover {
+            border-color: #1976d2;
+        }
+
+        .create-brand-btn {
+            background: #1976d2;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        .create-brand-btn:hover {
+            background: #1565c0;
+        }
+
+        .generator-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .preview-panel {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+        }
+
+        .preview-frame {
+            width: 100%;
+            aspect-ratio: 1;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+            background: #f8f9fa;
+        }
+
+        .preview-logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            max-width: 100px;
+            max-height: 100px;
+            object-fit: contain;
+        }
+
+        .preview-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+
+        .preview-products {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .preview-product {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .preview-text {
+            position: absolute;
+            bottom: 100px;
+            left: 20px;
+            right: 20px;
+            color: #333;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1;
+        }
+
+        .preview-contact {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            z-index: 1;
+        }
+
+        .preview-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav">
+        <div class="brand-name">BrandName</div>
+        <div class="top-nav-right">
+            <div class="nav-icon">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">3</span>
+            </div>
+            <div class="nav-icon">
+                <i class="fas fa-exclamation-circle"></i>
+                <span class="notification-badge">2</span>
+            </div>
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span>John Doe</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Right Sidebar -->
+    <div class="sidebar">
+        <ul class="sidebar-menu">
+            <li class="sidebar-item active">
+                <a href="index.html">
+                    <i class="fas fa-magic"></i>
+                    <span>Generate</span>
+                </a>
+            </li>
+            <li class="sidebar-item">    
+                <a href="brands.html">
+                    <i class="fas fa-building"></i>
+                    <span>Brands</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="projects.html">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>Projects</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="settings.html">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="templates.html">
+                    <i class="fas fa-code"></i>
+                    <span>Templates</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-title">
+            <i class="fas fa-magic"></i>
+            <h1>Generate</h1>
+        </div>
+        
+        <div class="category-grid">
+            <div class="category-card" data-category="social-media">
+                <div class="category-icon">
+                    <i class="fas fa-share-alt"></i>
+                </div>
+                <h2 class="category-title">Social Media Post</h2>
+                <p class="category-description">Create engaging social media content with AI-powered post generation. Perfect for multiple platforms.</p>
+            </div>
+
+            <div class="category-card">
+                <div class="category-icon">
+                    <i class="fab fa-facebook"></i>
+                </div>
+                <h2 class="category-title">Facebook Title</h2>
+                <p class="category-description">Generate attention-grabbing Facebook titles that increase engagement and reach.</p>
+            </div>
+
+            <div class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-images"></i>
+                </div>
+                <h2 class="category-title">Webpage Slider</h2>
+                <p class="category-description">Design beautiful and responsive webpage sliders with custom content and animations.</p>
+            </div>
+        </div>
+
+        <!-- Social Media Post Generator Section -->
+        <div class="social-media-generator" style="display: none;">
+            <div class="page-title">
+                <i class="fas fa-share-alt"></i>
+                <h1>Social Media Post Generator</h1>
+            </div>
+            
+            <div class="generator-container">
+                <!-- Form Section -->
+                <div class="generator-form" style="background: white; padding: 2rem; border-radius: 12px;">
+                    <div class="input-group">
+                        <label>Add Logo</label>
+                        <div class="logo-upload" id="socialMediaLogo">
+                            <i class="fas fa-cloud-upload-alt fa-2x"></i>
+                            <p>Click to upload logo or drag and drop</p>
+                            <input type="file" accept="image/*" style="display: none" id="logoInput">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Add Background</label>
+                        <div class="logo-upload" id="socialMediaBackground">
+                            <i class="fas fa-cloud-upload-alt fa-2x"></i>
+                            <p>Click to upload background or drag and drop</p>
+                            <input type="file" accept="image/*" style="display: none" id="backgroundInput">
+                        </div>
+                    </div>
+
+                    <div class="products-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0;">
+                        <div class="input-group">
+                            <label>Product 1</label>
+                            <div class="logo-upload">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Upload Product 1</p>
+                                <input type="file" accept="image/*" style="display: none" class="productInput">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Product 2</label>
+                            <div class="logo-upload">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Upload Product 2</p>
+                                <input type="file" accept="image/*" style="display: none" class="productInput">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Product 3</label>
+                            <div class="logo-upload">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Upload Product 3</p>
+                                <input type="file" accept="image/*" style="display: none" class="productInput">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Product 4</label>
+                            <div class="logo-upload">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Upload Product 4</p>
+                                <input type="file" accept="image/*" style="display: none" class="productInput">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Product 5</label>
+                            <div class="logo-upload">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Upload Product 5</p>
+                                <input type="file" accept="image/*" style="display: none" class="productInput">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Product 6</label>
+                            <div class="logo-upload">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Upload Product 6</p>
+                                <input type="file" accept="image/*" style="display: none" class="productInput">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Add Color</label>
+                        <div class="color-type-selector" style="margin-bottom: 1rem;">
+                            <button class="color-type-btn active" data-type="solid" style="padding: 0.5rem 1rem; border: none; background: #f0f0f0; border-radius: 5px; margin-right: 0.5rem; cursor: pointer;">Solid Color</button>
+                            <button class="color-type-btn" data-type="gradient" style="padding: 0.5rem 1rem; border: none; background: #f0f0f0; border-radius: 5px; cursor: pointer;">Gradient Color</button>
+                        </div>
+                        <div id="solidColorPicker" class="color-picker-container">
+                            <div class="color-option" style="background: #1976d2"></div>
+                            <div class="color-option" style="background: #388e3c"></div>
+                            <div class="color-option" style="background: #d32f2f"></div>
+                            <div class="color-option" style="background: #f57c00"></div>
+                            <div class="color-option" style="background: #7b1fa2"></div>
+                            <div class="color-option" style="background: #c2185b"></div>
+                            <div class="custom-color-option" style="border: 2px dashed #ddd; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                                <i class="fas fa-plus"></i>
+                                <input type="color" class="color-input" style="opacity: 0; position: absolute; width: 40px; height: 40px; cursor: pointer;">
+                                <span style="font-size: 0.8rem; margin-top: 0.2rem;">Choose</span>
+                            </div>
+                        </div>
+                        <div id="gradientColorPicker" class="color-picker-container" style="display: none;">
+                            <div class="color-option" style="background: linear-gradient(45deg, #1976d2, #64b5f6)"></div>
+                            <div class="color-option" style="background: linear-gradient(45deg, #388e3c, #81c784)"></div>
+                            <div class="color-option" style="background: linear-gradient(45deg, #d32f2f, #e57373)"></div>
+                            <div class="color-option" style="background: linear-gradient(45deg, #f57c00, #ffb74d)"></div>
+                            <div class="color-option" style="background: linear-gradient(45deg, #7b1fa2, #ba68c8)"></div>
+                            <div class="color-option" style="background: linear-gradient(45deg, #c2185b, #f06292)"></div>
+                            <div class="custom-gradient-option" style="border: 2px dashed #ddd; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <label style="font-size: 0.8rem;">Color 1:</label>
+                                    <input type="color" class="gradient-color-1" style="cursor: pointer;">
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <label style="font-size: 0.8rem;">Color 2:</label>
+                                    <input type="color" class="gradient-color-2" style="cursor: pointer;">
+                                </div>
+                                <button class="apply-gradient" style="padding: 0.3rem; border: 1px solid #ddd; border-radius: 3px; background: white; cursor: pointer;">Apply Gradient</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Add Text</label>
+                        <textarea id="postText" placeholder="Enter your text content" style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 5px; min-height: 100px;"></textarea>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Address</label>
+                        <textarea id="address" placeholder="Enter your address" style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 5px;"></textarea>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Website</label>
+                        <input type="url" id="website" placeholder="Enter your website URL" style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Contact Details</label>
+                        <input type="text" id="contact" placeholder="Enter your contact details" style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Project Name</label>
+                        <input type="text" id="projectName" placeholder="Enter your project name" style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+
+                    <button class="create-brand-btn" style="margin-top: 2rem;">Click to Generate</button>
+                </div>
+
+                <!-- Preview Section -->
+                <div class="preview-panel">
+                    <h2 style="margin-bottom: 1rem;">Live Preview</h2>
+                    <div class="preview-frame">
+                        <div class="preview-overlay"></div>
+                        <img class="preview-background" id="previewBackground">
+                        <img class="preview-logo" id="previewLogo">
+                        <div class="preview-products">
+                            <img class="preview-product" id="previewProduct1">
+                            <img class="preview-product" id="previewProduct2">
+                            <img class="preview-product" id="previewProduct3">
+                            <img class="preview-product" id="previewProduct4">
+                            <img class="preview-product" id="previewProduct5">
+                            <img class="preview-product" id="previewProduct6">
+                        </div>
+                        <div class="preview-text" id="previewText"></div>
+                        <div class="preview-contact">
+                            <div id="previewAddress"></div>
+                            <div id="previewWebsite"></div>
+                            <div id="previewContact"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Brands Section -->
+        <div class="brands-container">
+            <div class="page-title">
+                <i class="fas fa-building"></i>
+                <h1>Brands</h1>
+            </div>
+
+            <div class="create-brand-card" id="createBrandCard">
+                <div class="create-brand-icon">
+                    <i class="fas fa-plus-circle"></i>
+                </div>
+                <h2 class="create-brand-title">Create A Brand</h2>
+                <p class="create-brand-description">Click here to add an additional brand that you can use to generate assets</p>
+            </div>
+
+            <div class="brand-setup" id="brandSetup">
+                <div class="setup-step">
+                    <h3>1. Brand Name and Description</h3>
+                    <div class="input-group">
+                        <label for="brandName">Brand Name</label>
+                        <input type="text" id="brandName" placeholder="Enter your brand name">
+                    </div>
+                    <div class="input-group">
+                        <label for="brandDescription">Brand Description</label>
+                        <textarea id="brandDescription" placeholder="Describe your brand"></textarea>
+                    </div>
+                </div>
+
+                <div class="setup-step">
+                    <h3>2. Select Brand Logo</h3>
+                    <div class="logo-upload" id="logoUpload">
+                        <i class="fas fa-cloud-upload-alt fa-2x"></i>
+                        <p>Click to upload logo or drag and drop</p>
+                        <input type="file" id="logoInput" accept="image/*" style="display: none">
+                    </div>
+                </div>
+
+                <div class="setup-step">
+                    <h3>3. Select Brand Colors</h3>
+                    <div class="color-picker-container">
+                        <div class="color-option" style="background: #1976d2"></div>
+                        <div class="color-option" style="background: #388e3c"></div>
+                        <div class="color-option" style="background: #d32f2f"></div>
+                        <div class="color-option" style="background: #f57c00"></div>
+                        <div class="color-option" style="background: #7b1fa2"></div>
+                        <div class="color-option" style="background: #c2185b"></div>
+                    </div>
+                </div>
+
+                <button class="create-brand-btn">Create Brand</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="scripts.js"></script>
+    <script>
+        // Add click event listeners to sidebar items
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove active class from all items
+                document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+                // Add active class to clicked item
+                item.classList.add('active');
+
+                // Show/hide appropriate sections
+                const isBrands = item.querySelector('span').textContent === 'Brands';
+                document.querySelector('.category-grid').style.display = isBrands ? 'none' : 'grid';
+                document.querySelector('.brands-container').style.display = isBrands ? 'block' : 'none';
+            });
+        });
+
+        // Add click handlers for notifications
+        document.querySelectorAll('.nav-icon').forEach(icon => {
+            icon.addEventListener('click', () => {
+                alert('Notifications clicked');
+            });
+        });
+
+        // Add click handler for user profile
+        document.querySelector('.user-profile').addEventListener('click', () => {
+            alert('User profile clicked');
+        });
+
+        // Add click handlers for generation categories
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const categoryTitle = card.querySelector('.category-title').textContent;
+                
+                if (categoryTitle === 'Social Media Post') {
+                    document.querySelector('.category-grid').style.display = 'none';
+                    document.querySelector('.social-media-generator').style.display = 'block';
+                } else {
+                    alert(`Opening ${categoryTitle} generator...`);
+                }
+            });
+        });
+
+        // Create Brand Card Click Handler
+        document.getElementById('createBrandCard').addEventListener('click', () => {
+            document.getElementById('createBrandCard').style.display = 'none';
+            document.getElementById('brandSetup').style.display = 'block';
+        });
+
+        // Logo Upload Handler
+        document.getElementById('logoUpload').addEventListener('click', () => {
+            document.getElementById('logoInput').click();
+        });
+
+        // Color Selection Handler
+        document.querySelectorAll('.color-option').forEach(color => {
+            color.addEventListener('click', () => {
+                const container = color.closest('.color-picker-container');
+                container.querySelectorAll('.color-option').forEach(c => c.classList.remove('selected'));
+                color.classList.add('selected');
+            });
+        });
+
+        // Initialize all file upload areas
+        document.querySelectorAll('.logo-upload').forEach(upload => {
+            upload.addEventListener('click', () => {
+                upload.querySelector('input[type="file"]').click();
+            });
+        });
+
+        // Initialize all color options
+        document.querySelectorAll('.color-option').forEach(color => {
+            color.addEventListener('click', () => {
+                const container = color.closest('.color-picker-container');
+                container.querySelectorAll('.color-option').forEach(c => c.classList.remove('selected'));
+                color.classList.add('selected');
+            });
+        });
+
+        // Color Type Selector Handler
+        document.querySelectorAll('.color-type-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update button states
+                document.querySelectorAll('.color-type-btn').forEach(b => {
+                    b.classList.remove('active');
+                    b.style.background = '#f0f0f0';
+                });
+                btn.classList.add('active');
+                btn.style.background = '#e3e3e3';
+
+                // Show/hide appropriate color picker
+                const type = btn.dataset.type;
+                document.getElementById('solidColorPicker').style.display = type === 'solid' ? 'flex' : 'none';
+                document.getElementById('gradientColorPicker').style.display = type === 'gradient' ? 'flex' : 'none';
+            });
+        });
+
+        // Custom Solid Color Handler
+        document.querySelector('#solidColorPicker .color-input').addEventListener('input', (e) => {
+            const color = e.target.value;
+            const customOption = document.createElement('div');
+            customOption.className = 'color-option';
+            customOption.style.background = color;
+            
+            // Add click handler to the new color option
+            customOption.addEventListener('click', () => {
+                const container = customOption.closest('.color-picker-container');
+                container.querySelectorAll('.color-option').forEach(c => c.classList.remove('selected'));
+                customOption.classList.add('selected');
+            });
+
+            // Insert the new color option before the custom color picker
+            const customColorOption = document.querySelector('.custom-color-option');
+            customColorOption.parentNode.insertBefore(customOption, customColorOption);
+        });
+
+        // Custom Gradient Color Handler
+        document.querySelector('.apply-gradient').addEventListener('click', () => {
+            const color1 = document.querySelector('.gradient-color-1').value;
+            const color2 = document.querySelector('.gradient-color-2').value;
+            const customOption = document.createElement('div');
+            customOption.className = 'color-option';
+            customOption.style.background = `linear-gradient(45deg, ${color1}, ${color2})`;
+            
+            // Add click handler to the new gradient option
+            customOption.addEventListener('click', () => {
+                const container = customOption.closest('.color-picker-container');
+                container.querySelectorAll('.color-option').forEach(c => c.classList.remove('selected'));
+                customOption.classList.add('selected');
+            });
+
+            // Insert the new gradient option before the custom gradient picker
+            const customGradientOption = document.querySelector('.custom-gradient-option');
+            customGradientOption.parentNode.insertBefore(customOption, customGradientOption);
+        });
+
+        // Create Brand Button Handler
+        document.querySelector('.create-brand-btn').addEventListener('click', () => {
+            const brandName = document.getElementById('brandName').value;
+            const brandDescription = document.getElementById('brandDescription').value;
+            
+            if (!brandName.trim()) {
+                alert('Please enter a brand name');
+                return;
+            }
+
+            alert('Brand created successfully!');
+            // Here you can add code to handle the brand creation
+        });
+
+        // Preview Update Functions
+        function handleImageUpload(input, previewElement) {
+            input.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        previewElement.src = e.target.result;
+                        previewElement.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // Initialize preview handlers
+        document.addEventListener('DOMContentLoaded', () => {
+            // Logo preview
+            handleImageUpload(document.getElementById('logoInput'), document.getElementById('previewLogo'));
+
+            // Background preview
+            handleImageUpload(document.getElementById('backgroundInput'), document.getElementById('previewBackground'));
+
+            // Product previews
+            document.querySelectorAll('.productInput').forEach((input, index) => {
+                handleImageUpload(input, document.getElementById(`previewProduct${index + 1}`));
+            });
+
+            // Text preview
+            document.getElementById('postText').addEventListener('input', (e) => {
+                document.getElementById('previewText').textContent = e.target.value;
+            });
+
+            // Contact info preview
+            document.getElementById('address').addEventListener('input', (e) => {
+                document.getElementById('previewAddress').textContent = e.target.value;
+            });
+
+            document.getElementById('website').addEventListener('input', (e) => {
+                document.getElementById('previewWebsite').textContent = e.target.value;
+            });
+
+            document.getElementById('contact').addEventListener('input', (e) => {
+                document.getElementById('previewContact').textContent = e.target.value;
+            });
+
+            // Color preview
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelector('.preview-overlay').style.background = option.style.background;
+                });
+            });
+        });
+    </script>
+</body>
+</html>
